@@ -1,0 +1,9 @@
+SELECT ?work ?workLabel ?doi ?publicationDate WHERE {
+  ?work wdt:P361 wd:Q18477654.     # P361 = parte de, Q18477654 = NeuroMat
+  ?work wdt:P356 ?doi.             # P356 = DOI
+  OPTIONAL { ?work wdt:P577 ?publicationDate. }  # P577 = data de publicação
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?publicationDate)
+LIMIT 500
