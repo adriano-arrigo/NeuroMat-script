@@ -1,7 +1,7 @@
 # Retorna a bibliografia de um item
 
 SELECT ?valor ?valorLabel WHERE {
-  # 1. Encontra todos os valores (QIDs) da propriedade P2860 no item Q*********
+  # 1. Retorna todos os valores (QIDs) da propriedade "cita" (P2860) no item Q*********
   wd:Q********* wdt:P2860 ?valor .
   
   # 2. Usa o serviço de rótulos para preencher ?valorLabel
