@@ -1,0 +1,23 @@
+#title: Scholarly articles from NeuroMat, retrieving labels and identifiers
+SELECT ?item ?itemLabel ?doi ?isbn ?arxiv ?pmid WHERE {
+{?item wdt:P361 wd:Q18477654.}
+UNION
+{
+SERVICE wdsubgraph:wikidata_main {
+SELECT ?item ?itemLabel ?doi ?isbn ?arxiv ?pmid WHERE {
+?item wdt:P361 wd:Q18477654.
+OPTIONAL {?item wdt:P356 ?doi.}
+OPTIONAL {?item wdt:P212 ?isbn.}
+OPTIONAL {?item wdt:P818 ?arxiv.}
+OPTIONAL {?item wdt:P698 ?pmid.}
+SERVICE wikibase:label { bd:serviceParam wikibase:language "pt-br, pt, en, es, fr, de, ja, mul". }
+}
+}
+}
+OPTIONAL {?item wdt:P356 ?doi.}
+OPTIONAL {?item wdt:P212 ?isbn.}
+OPTIONAL {?item wdt:P818 ?arxiv.}
+OPTIONAL {?item wdt:P698 ?pmid.}
+SERVICE wikibase:label { bd:serviceParam wikibase:language "pt-br, pt, en, es, fr, de, ja, mul". }
+}
+
