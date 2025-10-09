@@ -1,3 +1,4 @@
+#Etapa 3 - Reconciliação dos dados
 # Atenção! Para aplicar esse script, é necessário ter o arquivo df_altmetric.csv gerado na etapa 2 
 
 import requests
