@@ -1,3 +1,4 @@
+# Etapa 1 - Coleta de dados
 # Este script coleta a produção científica do NeuroMat. Deve ser rodada em https://query-scholarly.wikidata.org.
 # O resultado deve ser salvo com o título df_wikidata.csv e salva na pasta /data/ da estrutura do Flask
 
