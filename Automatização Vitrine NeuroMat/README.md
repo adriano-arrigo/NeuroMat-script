@@ -10,12 +10,10 @@ Sugerimos o uso de ferramentas interativas, como **notebooks baseados em Python*
 
 ---
 
-## Etapa 1 — Coleta da produção científica
+## Etapa 1 - Coleta da produção científica
 
 Nesta etapa, ocorre a **coleta da produção científica do NeuroMat a partir do Wikidata**, utilizando consultas **SPARQL**.  
-O objetivo é gerar um **DataFrame** com os dados de publicações, autores, instituições e demais metadados disponíveis na Wikidata Query Service.
-
-### Sugestões de execução
+O objetivo é gerar um  arquivo *.csv* com os dados de publicações, autores, instituições e demais metadados disponíveis na Wikidata Query Service.
 
 1. Utilize o script em SPARQL que coleta a produção científica do NeuroMat, alterando as propriedades conforme necessário.
 
@@ -26,7 +24,7 @@ O objetivo é gerar um **DataFrame** com os dados de publicações, autores, ins
 
 5. Confirme se o arquivo gerado contém as colunas essenciais (item, title, authorLabel, publicationDate, etc.), pois ele servirá como entrada para a Etapa 2.
 
-## Etapa 2 — Extração altmétrica
+## Etapa 2 - Extração altmétrica
 
 Nessa fase, os dados coletados no Wikdiata serão enriquecidos com informações provenientes da API da Altmetric.
 1. Execute o script.
@@ -34,6 +32,6 @@ Nessa fase, os dados coletados no Wikdiata serão enriquecidos com informações
 > Após o script ser executado, será gerado um dataframe chamado **df_altmetric.csv**.
 
 ## Etapa 3 - Reconciliação de dados
-1. Execute o script.
+1. Execute o script para reconciliar os dados do arquivo gerado na etapa anterior.
 
 
