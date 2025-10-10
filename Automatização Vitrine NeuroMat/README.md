@@ -19,12 +19,10 @@ O objetivo é gerar um **DataFrame** com os dados de publicações, autores, ins
 
 1. Utilize o script em SPARQL que coleta a produção científica do NeuroMat, alterando as propriedades conforme necessário.
 
-2. Utilize uma biblioteca Python como `requests` ou `SPARQLWrapper` para enviar a query ao endpoint.
+2. Utilize uma biblioteca Python como `requests` ou `SPARQLWrapper` para enviar a query ao [endpoint].
   > Este endpoint é utilizado devido à separação do grafo principal do Wikidata (Wikidata Graph Split), garantindo a disponibilidade de dados científicos.
 
-3. Converta a resposta da consulta em um **DataFrame Pandas**.
-
-4. Salve o resultado em formato .csv no diretório da ferramenta.
+3. Salve o resultado em formato .csv no diretório da ferramenta.
 
 5. Confirme se o arquivo gerado contém as colunas essenciais (item, title, authorLabel, publicationDate, etc.), pois ele servirá como entrada para a Etapa 2.
 
