@@ -1,3 +1,6 @@
+# É necessário ter um arquivo .csv chamado "itens.csv" no mesmo diretório desse script com os QIDs a serem analisados, um por linha.
+# Esse arquivo .csv deve ter uma coluna com o título QID.
+
 import pandas as pd
 import requests
 import time
