@@ -1,78 +1,181 @@
 # É necessário ter um arquivo .csv chamado "itens.csv" no mesmo diretório desse script com os QIDs a serem analisados, um por linha.
 # Esse arquivo .csv deve ter uma coluna com o título QID.
+# A consulta é feita simultaneamente  nos endpoints Scholarly e Main, porque certas declarações estão disponíveis apenas em um deles devido ao split do grafo WDQS. 
+
+
+Perfeito — vou enviar um script corrigido e anotado que:
+
+consulta ambos os endpoints (Scholarly e Main) para cada lote;
+obtém contagem P2860 e rótulo (label) de cada endpoint separadamente;
+produz um CSV com colunas separadas para cada endpoint (Label_Scholarly, P2860_Scholarly, Label_Main, P2860_Main), além de:
+
+P2860_Final (o maior valor entre os dois),
+Endpoint_Maior (qual endpoint deu o maior valor — "scholarly", "main", "both", ou "none").
+
+
+
+Tudo em português e com tratamento básico de falhas.
+Cole e execute este script no mesmo diretório do seu itens.csv.
+"""
+Script: comparar_p2860_endpoints.py
+Descrição:
+    Para cada QID em itens.csv, consulta P2860 (citado por) em:
+      - query-scholarly.wikidata.org (endpoint acadêmico)
+      - query.wikidata.org (endpoint padrão)
+    Gera um CSV com resultados separados por endpoint e a escolha final (maior valor).
+Saída:
+    resultado_p2860_comparado_detalhado.csv
+"""
 
 import pandas as pd
 import requests
 import time
 import re
 
-# === CONFIGURAÇÕES ===
-csv_input = "itens.csv"              # arquivo CSV de entrada
-csv_output = "resultado_p2860.csv"   # arquivo CSV de saída
-endpoint = "https://query-scholarly.wikidata.org/sparql"  # ou "https://query.wikidata.org/sparql"
-batch_size = 20                      # tamanho do lote (use 20 para o Scholarly)
-delay = 2                            # segundos entre requisições
+# ---------------------------
+# CONFIGURAÇÕES
+# ---------------------------
+CSV_INPUT = "itens.csv"
+CSV_OUTPUT = "resultado_p2860.csv"
 
-# === FUNÇÃO PARA RODAR A QUERY ===
-def run_query(endpoint, query):
+ENDPOINT_SCHOLARLY = "https://query-scholarly.wikidata.org/sparql"
+ENDPOINT_MAIN = "https://query.wikidata.org/sparql"
+
+BATCH_SIZE = 40     # ajuste conforme necessidade (20-50 razoável)
+DELAY = 1.0         # segundos entre requisições para evitar rate limits
+TIMEOUT = 60        # timeout em segundos para requests
+
+USER_AGENT = "VitrineNeuroMatDataBot/0.1 (contato: arrigo.adriano@gmail.com)"  # personalizável
+
+# ---------------------------
+# FUNÇÕES AUXILIARES
+# ---------------------------
+def run_sparql_post(endpoint, query):
+    """
+    Executa uma consulta SPARQL via POST e retorna JSON (ou lança exception).
+    Uso de POST evita problemas com URLs muito longas (especialmente no Scholarly).
+    """
     headers = {
-        "User-Agent": "NeuroMatDataBot/0.1 (https://neuromat.numec.prp.usp.usp.br)",
+        "User-Agent": USER_AGENT,
         "Accept": "application/sparql-results+json",
-        "Content-Type": "application/sparql-query"
+        "Content-Type": "application/sparql-query; charset=utf-8"
     }
-    response = requests.post(endpoint, data=query.encode('utf-8'), headers=headers)
-    response.raise_for_status()
-    return response.json()
+    resp = requests.post(endpoint, data=query.encode("utf-8"), headers=headers, timeout=TIMEOUT)
+    resp.raise_for_status()
+    return resp.json()
 
-# === CARREGAR E LIMPAR CSV ===
-df = pd.read_csv(csv_input)
-df.columns = df.columns.str.strip().str.upper()
+def consultar_p2860_completa(endpoint, qids):
+    """
+    Consulta counts e labels para um lote de QIDs num dado endpoint.
+    Retorna dicionário:
+      { 'Q123': {'count': int, 'label': '...', 'endpoint': 'scholarly'|'main'} , ... }
+    """
+    if not qids:
+        return {}
 
-if "QID" not in df.columns:
-    raise ValueError("O arquivo CSV precisa ter uma coluna chamada 'QID'.")
-
-# Limpa QIDs e remove valores inválidos
-qids = df["QID"].dropna().astype(str).str.strip().unique().tolist()
-qids = [qid for qid in qids if re.match(r"^Q\d+$", qid)]
-
-print(f"Total de itens a verificar: {len(qids)}")
-
-# === CONSULTAR EM LOTES ===
-results = []
-for i in range(0, len(qids), batch_size):
-    batch = qids[i:i+batch_size]
-    print(f" Consultando lote {i//batch_size + 1} ({len(batch)} itens)...")
-
-    values_str = " ".join(f"wd:{qid}" for qid in batch)
+    values = " ".join(f"wd:{qid}" for qid in qids)
+    # Query: conta P2860 por item e traz label (se houver)
     query = f"""
     SELECT ?item ?itemLabel (COUNT(?citation) AS ?numCitations)
     WHERE {{
-      VALUES ?item {{ {values_str} }}
+      VALUES ?item {{ {values} }}
       OPTIONAL {{ ?item wdt:P2860 ?citation. }}
       SERVICE wikibase:label {{ bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }}
     }}
     GROUP BY ?item ?itemLabel
     """
 
-    try:
-        data = run_query(endpoint, query)
-        for b in data["results"]["bindings"]:
-            results.append({
-                "QID": b["item"]["value"].split("/")[-1],
-                "Label": b.get("itemLabel", {}).get("value", ""),
-                "numCitations": int(b.get("numCitations", {}).get("value", 0))
+    data = run_sparql_post(endpoint, query)
+    out = {}
+    for b in data.get("results", {}).get("bindings", []):
+        qid = b["item"]["value"].split("/")[-1]
+        label = b.get("itemLabel", {}).get("value", "")
+        count = int(b.get("numCitations", {}).get("value", 0))
+        out[qid] = {"count": count, "label": label}
+    # Para QIDs que não aparecem no resultado, retornaremos 0 e label vazio (fora da função)
+    return out
+
+# ---------------------------
+# FLUXO PRINCIPAL
+# ---------------------------
+def main():
+    # 1) carregar CSV
+    df = pd.read_csv(CSV_INPUT)
+    df.columns = df.columns.str.strip().str.upper()
+    if "QID" not in df.columns:
+        raise ValueError("O arquivo CSV precisa ter coluna 'QID' (exatamente).")
+
+    # limpar QIDs
+    qids_raw = df["QID"].dropna().astype(str).str.strip().unique().tolist()
+    qids = [q for q in qids_raw if re.match(r"^Q\d+$", q)]
+    print(f"Total QIDs válidos: {len(qids)}")
+
+    # 2) Preparar estrutura para resultados
+    registros = []
+
+    # 3) Percorrer em lotes e consultar ambos endpoints
+    for start in range(0, len(qids), BATCH_SIZE):
+        lote = qids[start:start + BATCH_SIZE]
+        print(f"Processando lote {start//BATCH_SIZE + 1}: {len(lote)} itens...")
+
+        # 3a) consultar Scholarly (POST)
+        scholarly_data = {}
+        try:
+            scholarly_data = consultar_p2860_completa(ENDPOINT_SCHOLARLY, lote)
+        except Exception as e:
+            print(f"  Erro ao consultar Scholarly no lote {start//BATCH_SIZE + 1}: {e}")
+
+        time.sleep(DELAY)
+
+        # 3b) consultar Main (POST)
+        main_data = {}
+        try:
+            main_data = consultar_p2860_completa(ENDPOINT_MAIN, lote)
+        except Exception as e:
+            print(f"  Erro ao consultar Main no lote {start//BATCH_SIZE + 1}: {e}")
+
+        time.sleep(DELAY)
+
+        # 3c) compilar resultados por item
+        for q in lote:
+            schol = scholarly_data.get(q, {"count": 0, "label": ""})
+            m = main_data.get(q, {"count": 0, "label": ""})
+
+            count_schol = schol["count"]
+            count_main = m["count"]
+            label_schol = schol["label"]
+            label_main = m["label"]
+
+            # decidir final: maior valor; se iguais e >0 -> both; se ambos 0 -> none
+            if count_schol > count_main:
+                final_count = count_schol
+                endpoint_maior = "scholarly"
+            elif count_main > count_schol:
+                final_count = count_main
+                endpoint_maior = "main"
+            else:  # iguais
+                final_count = count_schol  # (ambos iguais)
+                if final_count == 0:
+                    endpoint_maior = "none"
+                else:
+                    endpoint_maior = "both"
+
+            registros.append({
+                "QID": q,
+                "Label_Scholarly": label_schol,
+                "P2860_Scholarly": count_schol,
+                "Label_Main": label_main,
+                "P2860_Main": count_main,
+                "P2860_Final": final_count,
+                "Endpoint_Maior": endpoint_maior
             })
-    except Exception as e:
-        print(f" Erro no lote {i//batch_size + 1}: {e}")
 
-    time.sleep(delay)
+    # 4) salvar resultado completo em CSV
+    df_out = pd.DataFrame(registros)
+    df_out = df.merge(df_out, on="QID", how="right")
+    df_out.to_csv(CSV_OUTPUT, index=False)
+    print(f" Salvo: {CSV_OUTPUT}")
 
-# === JUNTAR RESULTADOS ===
-results_df = pd.DataFrame(results)
-results_df.rename(columns={"item": "QID"}, inplace=True)
-
-merged = df.merge(results_df, on="QID", how="left")
-merged["numCitations"] = merged["numCitations"].fillna(0).astype(int)
-
-merged.to_csv(csv_output, index=False)
-print(f"Resultados salvos em: {csv_output}")
+if __name__ == "__main__":
+    main()
+N
