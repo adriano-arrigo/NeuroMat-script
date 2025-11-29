@@ -1,4 +1,4 @@
-# Retorna a bibliografia de um item
+# Retorna a bibliografia de um único item no Wikidata
 # Rodar o script em: https://query-scholarly.wikidata.org/
 
 SELECT ?valor ?valorLabel WHERE {
