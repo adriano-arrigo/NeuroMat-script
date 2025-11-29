@@ -1,3 +1,10 @@
+# Esta consulta retorna até 500 trabalhos associados ao NeuroMat (Q18477654)
+# por meio da propriedade "parte de" (P361). 
+# Para cada trabalho, recupera o DOI (P356) e, se disponível, a data de publicação (P577).
+# Os resultados são ordenados da data mais recente para a mais antiga
+# e incluem os rótulos dos itens no idioma automático ou em inglês.
+
+
 SELECT ?work ?workLabel ?doi ?publicationDate WHERE {
   ?work wdt:P361 wd:Q18477654.     # P361 = parte de, Q18477654 = NeuroMat
   ?work wdt:P356 ?doi.             # P356 = DOI
