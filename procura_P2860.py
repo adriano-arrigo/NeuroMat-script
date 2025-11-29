@@ -1,6 +1,9 @@
-# É necessário ter um arquivo .csv chamado "itens.csv" no mesmo diretório desse script com os QIDs a serem analisados, um por linha.
-# Esse arquivo .csv deve ter uma coluna com o título QID.
-# A consulta é feita simultaneamente  nos endpoints Scholarly e Main, porque certas declarações estão disponíveis apenas em um deles devido ao split do grafo WDQS. 
+# Este script gera um arquivo CSV com a contagem total de referências bibliográficas (propriedade P2860)
+# para um conjunto de itens listados (lote) em um arquivo itens.csv. 
+# Para cada QID, o script consulta simultaneamente os endpoints Scholarly e Main do WDQS,
+# pois, devido ao split do grafo, algumas referências podem aparecer apenas em um dos endpoints.
+# O resultado final mostra o total de P2860 e indica em qual endpoint esse total foi maior.
+# Não é mostrado o título de cada referência bibliográfica, apenas um número total resultado da soma referência bibliográfica do item analisado.
 
 import pandas as pd
 import requests
