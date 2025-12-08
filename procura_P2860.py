@@ -1,8 +1,8 @@
 # Este script gera um arquivo CSV com a contagem total de referências bibliográficas (propriedade P2860)
-# para um conjunto de itens listados (lote) em um arquivo itens.csv. 
+# para um conjunto de itens listado sem um arquivo itens.csv (o script que que atua nessa parte pode ser encoontrado em https://github.com/adriano-arrigo/NeuroMat-script/blob/main/procura_P2860.py)
 # Para cada QID, o script consulta simultaneamente os endpoints Scholarly e Main do WDQS,
 # pois, devido ao split do grafo, algumas referências podem aparecer apenas em um dos endpoints.
-# O resultado final mostra o total de P2860 e indica em qual endpoint esse total foi maior.
+# O resultado final mostra nas últimas colunas do .csv o total de P2860 e indica em qual endpoint esse total foi maior.
 # Não é mostrado o título de cada referência bibliográfica, apenas um número total resultado da soma referência bibliográfica do item analisado.
 
 import pandas as pd
