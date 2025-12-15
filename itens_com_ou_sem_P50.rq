@@ -1,0 +1,22 @@
+# Esse script coleta toda a produção científica do NeuroMat
+# e mostra quantos (valor total, somente) possuem 
+# a propriedade P50 (AUTOR) ou P2093 (NOME DE AUTOR).
+SELECT
+  (COUNT(DISTINCT ?artigoComP50) AS ?artigos_com_P50)
+  (COUNT(DISTINCT ?artigoSemP50) AS ?artigos_sem_P50)
+WHERE {
+  {
+    SELECT ?artigoComP50 WHERE {
+      ?artigoComP50 wdt:P361 wd:Q18477654.
+      ?artigoComP50 wdt:P50 ?autor.
+    }
+  }
+  UNION
+  {
+    SELECT ?artigoSemP50 WHERE {
+      ?artigoSemP50 wdt:P361 wd:Q18477654.
+      ?artigoSemP50 wdt:P2093 ?autorString.
+      FILTER NOT EXISTS { ?artigoSemP50 wdt:P50 ?a. }
+    }
+  }
+}
