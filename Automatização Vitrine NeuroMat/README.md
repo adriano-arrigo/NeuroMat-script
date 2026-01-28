@@ -12,7 +12,7 @@ Sugerimos o uso de ferramentas interativas, como **notebooks baseados em Python*
 
 ## Etapa 1 - Coleta da produção científica
 
-Nesta etapa, ocorre a **coleta da produção científica do NeuroMat a partir do Wikidata**, utilizando consultas **SPARQL**.  
+Nesta etapa, ocorre a **coleta da produção científica do NeuroMat a partir do Wikidata**, utilizando consultas **SPARQL** concentradas [nesse script](https://github.com/adriano-arrigo/NeuroMat-script/blob/dd54ced850233d9874ae6bf5f0c496d5c8bafc76/Automatiza%C3%A7%C3%A3o%20Vitrine%20NeuroMat/Etapa%201%20-%20Coletar%20a%20produ%C3%A7%C3%A3o%20cient%C3%ADfica%20do%20NeuroMat%20do%20Wikidata.rq).  
 O objetivo é gerar um  arquivo *.csv* com os dados de publicações, autores, instituições e demais metadados disponíveis na Wikidata Query Service.
 
 1. Utilize o script em SPARQL que coleta a produção científica do NeuroMat, alterando as propriedades conforme necessário.
