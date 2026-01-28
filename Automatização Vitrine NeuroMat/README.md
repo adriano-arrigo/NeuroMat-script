@@ -1,24 +1,26 @@
+ # __________ EM CONSTRUÇÃO __________
+
 # Execução dos scripts fora do Flask
 
-Este documento é uma ajuda para rodar os scripts fora do Flask.  
-A metodologia proposta nesse repositório está intrinsecamente relacionada ao framework Flask.  
-Porém, o passo a passo para executar essa metodologia fora do Flask fica a critério do usuário.  
+Este documento é um documento para executar os scripts do projeto fora do Flask, embora a metodologia proposta nesse repositório está intrinsecamente relacionada ao framework Flask, embora seja possível executar este passo a passo fora do ambiente Flask.  
 
-Sugerimos o uso de ferramentas interativas, como **notebooks baseados em Python**, que permitem a execução sequencial do código e a visualização imediata dos resultados.
+## Pré-requisitos
+Sugerimos o uso de ferramentas interativas, como **notebooks baseados em Python** (Google Colab ou Jupyter Notebook), que permitem a execução sequencial do código e a visualização dos resultados.
 
-É necessário, então, que, pelo menos, as três etapas iniciais sejam executadas nessas ferramentas.
+A partir disso, é necessário, então, que, pelo menos, as três etapas iniciais sejam executadas nessas ferramentas.
 
 ---
 
 ## Etapa 1 - Coleta da produção científica
 
-Nesta etapa, ocorre a **coleta da produção científica do NeuroMat a partir do Wikidata**, utilizando consultas **SPARQL** concentradas [nesse script](https://github.com/adriano-arrigo/NeuroMat-script/blob/dd54ced850233d9874ae6bf5f0c496d5c8bafc76/Automatiza%C3%A7%C3%A3o%20Vitrine%20NeuroMat/Etapa%201%20-%20Coletar%20a%20produ%C3%A7%C3%A3o%20cient%C3%ADfica%20do%20NeuroMat%20do%20Wikidata.rq).  
+Nesta etapa, ocorre a **coleta da produção científica de uma base dados no Wikidata**, (no caso aqui, a base do Cepid NeuroMat) utilizando consultas **SPARQL** concentradasso script 1.
 O objetivo é gerar um  arquivo *.csv* com os dados de publicações, autores, instituições e demais metadados disponíveis na Wikidata Query Service.
 
-1. Utilize o script em SPARQL que coleta a produção científica do NeuroMat, alterando as propriedades conforme necessário.
+### 1. [Script 1 - Coleta de dados](https://github.com/adriano-arrigo/NeuroMat-script/blob/dd54ced850233d9874ae6bf5f0c496d5c8bafc76/Automatiza%C3%A7%C3%A3o%20Vitrine%20NeuroMat/Etapa%201%20-%20Coletar%20a%20produ%C3%A7%C3%A3o%20cient%C3%ADfica%20do%20NeuroMat%20do%20Wikidata.rq)
+* Script em SPARQL responsável pela coleta a produção científica do NeuroMat, alterando as propriedades conforme necessário.
+* Esse script utiliza biblioteca Python como `requests` ou `SPARQLWrapper` para enviar a requisão de dados ao endpoint Scholary[^1] do Wikidata.
 
-2. Utilize uma biblioteca Python como `requests` ou `SPARQLWrapper` para enviar a query ao [endpoint].
-  > Este endpoint é utilizado devido à separação do grafo principal do Wikidata (Wikidata Graph Split), garantindo a disponibilidade de dados científicos.
+[^1]: Este endpoint é utilizado devido à separação do grafo principal do Wikidata (Wikidata Graph Split), garantindo a disponibilidade de dados científicos.
 
 3. Salve o resultado em formato *.csv* no diretório da ferramenta.
 
