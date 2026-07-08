@@ -29,7 +29,6 @@ def normalizar_doi_score(valor):
         mantissa = mantissa.replace(",", "").replace(".", "")
         return float(mantissa) / 100
 
-    # Caso estranho gerado pelo Excel: 26.849.999.999.999.900
     # Remove todos os pontos e recoloca decimal nas duas últimas casas
     if valor.count(".") > 1:
         apenas_digitos = re.sub(r"\D", "", valor)
